@@ -1,0 +1,19 @@
+# Python-generated files
+**/__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+wandb/
+*.egg-info
+
+# Virtual environments
+.venv/
+
+data/
+
+coco-segmentation/
+
+# Ignore the local model weights
+unet_weights.pth
+
