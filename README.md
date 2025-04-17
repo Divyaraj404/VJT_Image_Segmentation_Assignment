@@ -1,129 +1,124 @@
-# COCO UNet Segmentation Assignment
+# COCO UNet Segmentation Assignment – Task 2
 
-This repository contains the implementation for **Task 2: Image Segmentation** of the VJT assignment, building on the dataset you prepared in **Task 1**.
+This repository contains the implementation for **Task 2: Image Segmentation** of the VJT assignment, building on the dataset prepared in **[Task 1](https://github.com/Divyaraj404/VJT_Image_Segmentation_Assignment_task1)**.
 
 ---
 
 ## 📁 Repository Structure
-
 ```
-├── data/                      # (Empty; placeholder .gitkeep). Download assets into this folder before running.
-├── coco-segmentation/         # (Empty; placeholder .gitkeep)
+├── data/                      # (Empty; download assets here – see below)
+├── coco-segmentation/         # (Empty placeholder)
 ├── src/                       # Source code
-│   ├── dataset.py             # Dataset class & COCO→11-class remapping
-│   ├── unet.py                # UNet model definition
-│   ├── lit_module.py          # PyTorch Lightning module encapsulating training/validation
+│   ├── dataset.py             # Dataset & COCO→11‑class remapping
+│   ├── unet.py                # UNet architecture
+│   ├── lit_module.py          # LightningModule (loss + metrics)
 │   ├── train.py               # Training script (Trainer, callbacks, WandB)
-│   ├── test.py                # Evaluate on held-out test set
-│   ├── inference.py           # Inference on a single image
-│   ├── inference_batch.py     # Batch inference over a folder of images
+│   ├── test.py                # Evaluation on unseen test set
+│   ├── inference.py           # Single‑image inference
+│   ├── inference_batch.py     # Batch inference over a folder
 │   └── dataloader_test.py     # DataLoader sanity check
-├── requirements.txt           # Declared dependencies
-├── uv.lock                    # Locked environment (uv)
-├── .gitignore                 # Ignored files/folders (data/, model weights, etc.)
-└── README.md                  # This file
+├── requirements.txt           # Dependencies
+├── uv.lock                    # Locked env (uv)
+├── .gitignore                 # Ignore rules (data/, checkpoints, etc.)
+└── README.md                  # You’re reading it
 ```
 
 ---
 
-## 🔗 Important Links
+## 🔗 Links & Assets
 
-- **Task 1: Dataset Preparation**\
-  [https://github.com/Divyaraj404/VJT\_Image\_Segmentation\_Assignment\_task1](https://github.com/Divyaraj404/VJT_Image_Segmentation_Assignment_task1)
+| Purpose | Link |
+| ------- | ---- |
+| **Task 1 code** | <https://github.com/Divyaraj404/VJT_Image_Segmentation_Assignment_task1> |
+| **Dataset & checkpoints (Google Drive)**<br>Download & extract into project root *before running* | <https://drive.google.com/drive/folders/1dE3X83SM7vdxHjRr5MxF3VaT5WFAC2uu?usp=sharing> |
+| **Final model training runs (WandB)** | <https://wandb.ai/chundawatdivyaraj01-indian-institute-of-science/coco-segmentation?nw=nwuserchundawatdivyaraj01> |
+| **Earlier experiment logs (baseline model)** | <https://wandb.ai/chundawatdivyaraj01-indian-institute-of-science/segmentation-training?nw=nwuserchundawatdivyaraj01> |
 
-- **Additional Assets (5 GB)**\
-  Download and extract **all files** from this Google Drive folder into the project root before running any code:\
-  [https://drive.google.com/drive/folders/1dE3X83SM7vdxHjRr5MxF3VaT5WFAC2uu?usp=sharing](https://drive.google.com/drive/folders/1dE3X83SM7vdxHjRr5MxF3VaT5WFAC2uu?usp=sharing)
+> **Important:** The Drive folder contains `data/train_*`, `data/val_*`, `data/test_*` and optional pre‑trained checkpoints. Place these folders directly under the repo root so their paths match the defaults in `src/train.py`.
 
-  > The folder contains:
-  >
-  > - `data/train_images/` & `data/train_masks/` (training split)
-  > - `data/val_images/` & `data/val_masks/` (validation split)
-  > - `data/test_images/` & `data/test_masks/` (test split)
-  > - Pre-generated checkpoints: `checkpoints/unet-*.ckpt`
+---
 
-## 🚀 Setup & Installation
+## 🚀 Quick Start
 
-1. **Clone this repository**
+```bash
+# Clone repo
+git clone https://github.com/Divyaraj404/VJT_Image_Segmentation_Assignment.git
+cd VJT_Image_Segmentation_Assignment
 
-   ```bash
-   git clone https://github.com/Divyaraj404/VJT_Image_Segmentation_Assignment.git
-   cd VJT_Image_Segmentation_Assignment
-   ```
+# Download dataset/checkpoints from Drive → put in ./data/
 
-2. **Download and place data & checkpoints**
-
-   - Download the assets from the Drive link above.
-   - Place the `data/` folder and `checkpoints/` folder at the project root so paths match `train.py`.
-
-3. **Initialize environment with uv** (requires Python 3.8+):
-
-   ```bash
-   uv init --python=3.8
-   uv install -r requirements.txt
-   ```
-
-4. **Activate the virtual environment**
-
-   ```bash
-   source venv/bin/activate    # or `uv shell` if configured
-   ```
-
-5. **Verify CUDA & dependencies**
-
-   ```bash
-   python -c "import torch; print('CUDA available:', torch.cuda.is_available())"
-   ```
+# Create & install env with uv
+uv init --python=3.8
+uv install -r requirements.txt
+source venv/bin/activate   # or `uv shell`
+```
+Verify GPU:
+```bash
+python - <<'PY'
+import torch
+print('CUDA available:', torch.cuda.is_available())
+PY
+```
 
 ---
 
 ## 🏋️‍♂️ Training
 
-Run the training script:
-
 ```bash
 python src/train.py
 ```
+The script:
+* Loads data from `data/train_*` / `data/val_*`
+* Logs all metrics to **Weights & Biases** (links above)
+* Saves best checkpoint (by val IoU) under `lightning_logs/.../checkpoints/`
 
-**Configurable settings** (edit `src/train.py` before running):
+### Editable settings (`src/train.py`)
+| Variable | Meaning |
+| -------- | ------- |
+| `train_images_dir`, `train_masks_dir`, etc. | Input folders |
+| `BATCH_SIZE` | Batch size (default 4) |
+| `max_epochs` | Total epochs for `pl.Trainer` |
+| `precision` | 16 (mixed) or 32 |
+| `lr` | Learning rate |
+| `early_stop_patience` | Epochs with no val IoU improvement before stopping (default 5) |
+| WandB `project` & `name` | Change run grouping |
 
-- `train_images_dir`, `train_masks_dir`, `val_images_dir`, `val_masks_dir`: Path to data folders under `data/`.
-- `BATCH_SIZE`: Batch size for training/validation DataLoaders.
-- `max_epochs`: Number of epochs in `pl.Trainer(max_epochs=...)`.
-- `precision`: 16 or 32 in `Trainer(precision=...)`.
-- `lr`: Learning rate passed to `SegmentationModule(..., lr)`.
-- WandB project/name: in `WandbLogger(project=..., name=...)`.
-
-Training outputs the best checkpoint (by val IoU) to `lightning_logs/.../checkpoints/`.
+You can edit these directly in `src/train.py` before running.
 
 ---
 
-## 🧪 Evaluation & Testing
-
-Evaluate on the held‑out test set:
+## 🧪 Evaluate
 
 ```bash
 python src/test.py
 ```
-
-Prints Test IoU, Dice score, and pixel accuracy.
+Prints **Test IoU, Dice, pixel accuracy**.
 
 ---
 
 ## 🔍 Inference
 
-### Single‑image inference
-
+Single image:
 ```bash
-python src/inference.py --input data/new_images/img1.jpg --output data/prediction.png
+python src/inference.py --input path/to.jpg --output out.png
 ```
-
-### Batch inference
-
+Batch folder:
 ```bash
 python src/inference_batch.py
 ```
-
-Saves colored masks (`mask_<filename>`) and overlays (`overlay_<filename>`) in `data/predictions/`.
+Results saved to `data/predictions/`.
 
 ---
+
+## 🔭 Experiment Tracking (WandB)
+* All training/validation metrics, LR curves, and example predictions are logged automatically.
+* Final runs: see [coco‑segmentation workspace](https://wandb.ai/chundawatdivyaraj01-indian-institute-of-science/coco-segmentation?nw=nwuserchundawatdivyaraj01).
+* Early baseline runs: see [segmentation‑training workspace](https://wandb.ai/chundawatdivyaraj01-indian-institute-of-science/segmentation-training?nw=nwuserchundawatdivyaraj01).
+
+> To run your own logging, install WandB (`pip install wandb`) and `wandb login` with your API key.
+
+---
+
+## 📋 License & Citation
+This code is for educational use. Please cite this repo or the WandB runs if you build upon it.
+
