@@ -3,7 +3,6 @@ import torch
 from torch.utils.data import DataLoader
 from dataset import COCOSegDataset, train_transforms, val_transforms
 
-# Adjust these paths according to your project structure:
 train_images_dir = "data/train_images"
 train_masks_dir  = "data/train_masks"
 val_images_dir   = "data/val_images"
