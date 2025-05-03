@@ -7,7 +7,6 @@ from albumentations.pytorch import ToTensorV2
 import albumentations as A
 import torch
 
-# Replace 'path/to/best.ckpt' with your checkpoint path.
 model = SegmentationModule.load_from_checkpoint("coco-segmentation/k3dri1gd/checkpoints/unet-epoch=12-val_iou=0.0476.ckpt")
 model.eval()
 model.freeze()  # Freeze the model for inference
