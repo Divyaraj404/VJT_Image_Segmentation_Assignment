@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import pytorch_lightning as pl
-from unet import UNet  # Import the UNet model you defined in Step 4
+from unet import UNet  
 from torchmetrics.classification import JaccardIndex, Accuracy
 from torchmetrics.segmentation import DiceScore
 
